@@ -17,7 +17,7 @@
         const form = document.querySelector('form');
         form.addEventListener('submit', async (event) => {
           event.preventDefault(); // предотвращаем стандартную отправку формы
-          const response = await fetch('http://127.0.0.1:5000/', {
+          const response = await fetch('http://192.168.31.179:5000/', {
             method: form.method,
             body: new FormData(form)
           });

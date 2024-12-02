@@ -1,59 +1,149 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-  </style>
-  {% block title %}
-  {% if title %}
-    <title>Про Flask - {{ title }}</title>
-  {% else %}
-    <title>Про Flask</title>
-  {% endif %}
-  {% endblock %}
+<title>Бар - Конфиги</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+nav {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  display: inline;
+  margin-right: 20px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
+section {
+  padding: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}
+form {
+    margin-top: 20px;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+</style>
 </head>
 <body>
-  {% block content %}
+  
+    <nav>
+      <ul>
+        {% if role_id != 2 %}
+          <li><a href="/users" id="users-tab" class="active">Пользователи</a></li>
+        {% endif %}
+        <li><a href="/homepage" id="configs-tab">Конфиги</a></li>
+        <li><a href="/groups" id="groups-tab">Группы</a></li>
+      </ul>
+    </nav>
+  
+    <section id="users-content">
+      <h1>Пользователи</h1>
+    </section>
+
+    <form action="{{url_for('users_page')}}" method="POST">
+      <label for="role_id">Роль: число 1 - админ, 2 - клиент:</label><br>
+      <input type="text" name="role" value="" requied><br>
+      <label for="user_full_name">Имя: Иван И.И.</label><br>
+      <input type="text" name="f_name" value="" requied><br>
+      <label for="user_number">Номер: 8ХХХХХХХХХХ</label><br>
+      <input type="text" name="number" value="" requied><br>
+      <input type="submit" value="Добавить пользователя">
+    </form>
+
+    <h2>Таблица Пользователей</h2>
+
     <table>
-      <thead>
+      <tr>
+        <th>ID Пользователя</th>
+        <th>ID Роли</th>
+        <th>Полное Имя</th>
+        <th>Номер</th>
+      </tr>
+      {% for user in users %}
         <tr>
-          <th>config_id</th>
-          <th>group_id</th>
-          <th>host_user_id</th>
-          <th>site_name</th>
-          <th>url</th>
-          <th>access_token</th>
+          <td>{{ user['user_id'] }}</td>
+          <td>{{ user['role_id'] }}</td>
+          <td>{{ user['user_full_name'] }}</td>
+          <td>{{ user['user_number'] }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for item in data %}
-        <tr>
-          <td>{{ item[0] }}</td>
-          <td>{{ item[1] }}</td>
-          <td>{{ item[2] }}</td>
-          <td>{{ item[3] }}</td>
-          <td>{{ item[4] }}</td>
-          <td>{{ item[5] }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      {% endfor %}
     </table>
-    {% if title %}
-      <h1>{{ title }}</h1>
-    {% else %}
-      <h1>Про Flask</h1>
-    {% endif %}
-  {% endblock %}
+
+<script>
+
+  const form = document.querySelector('form');
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault(); // предотвращаем стандартную отправку формы
+          const response = await fetch('http://192.168.31.179:5000/', {
+            method: form.method,
+            body: new FormData(form)
+          });
+          if (!response.redirected) {
+            const data = await response.json();
+            if (data.error) {
+              alert(data.error); //отображение alert
+            }
+          } else {
+            console.log(1)
+            window.location.href = '/users';
+          }
+        });
+
+  const usersContent = document.getElementById('users-content');
+  const usersTab = document.getElementById('users-tab');
+
+  if (userId === null || userId === undefined || userId === 0) { // Если пользователь не авторизован
+    usersTab.style.display = 'none';
+  } else {
+    usersTab.addEventListener('click', (event) => {
+      event.preventDefault();
+      usersContent.classList.remove('hidden');
+    });
+  }
+
+
+  // Активная вкладка по умолчанию
+  const tabs = document.querySelectorAll('nav a');
+  const contents = document.querySelectorAll('section');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', (event) => {
+      event.preventDefault();
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      contents.forEach(content => content.classList.add('hidden'));
+      document.getElementById(tab.id.replace('-tab', '-content')).classList.remove('hidden');
+    });
+  });
+
+</script>
+
 </body>
 </html>
+

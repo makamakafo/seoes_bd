@@ -1,97 +1,110 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Описание приложения SEOES</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+<title>Бар - Группы</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+nav {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  display: inline;
+  margin-right: 20px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
+section {
+  padding: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+</style>
 </head>
 <body>
+    <nav>
+        <ul>
+          {% if role_id != 2 %}
+            <li><a href="/users" id="users-tab">Пользователи</a></li>
+          {% endif %}
+          <li><a href="/homepage" id="configs-tab" >Конфиги</a></li>
+          <li><a href="/groups" id="groups-tab" class="active"      >Группы</a></li>
+        </ul>
+      </nav>
+    
+      <section id="groups-content">
+        <h2>Группы</h2>
+        <!-- Здесь будет контент для групп -->
+        <p>Информация о группах пользователей.</p>
+      </section>
 
-    <h1>Приложение SEOES: Описание</h1>
-
-    <p>Приложение SEOES предназначено для управления и анализа данных, связанных с поисковой оптимизацией (SEO). Оно обеспечивает функциональность для хранения и обработки информации о ключевых словах, позициях в поисковой выдаче, кликах и просмотрах страниц.</p>
-
-    <h2>Основные функции:</h2>
-
-    <ul>
-        <li>Хранение данных о ключевых словах, включая их позиции в поисковой выдаче для разных поисковых систем.</li>
-        <li>Отслеживание изменений позиций ключевых слов во времени.</li>
-        <li>Анализ эффективности SEO-кампаний на основе данных о кликах и просмотрах.</li>
-        <li>Управление группами ключевых слов и проектами.</li>
-        <li>Генерация отчётов и визуализация данных.</li>
-        <li>Управление пользователями и ролями доступа.</li>
-    </ul>
-
-    <h2>Структура базы данных:</h2>
+    <h1>Таблица Групп</h1>
 
     <table>
-        <thead>
-            <tr>
-                <th>Таблица</th>
-                <th>Описание</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>`secoes.search_data`</td>
-                <td>Хранит данные о позициях ключевых слов в поисковой выдаче.  Содержит информацию о ключевом слове, дате, позиции и т.д.</td>
-            </tr>
-            <tr>
-                <td>`secoes.config`</td>
-                <td>Настройки приложения и проектов.</td>
-            </tr>
-            <tr>
-                <td>`secoes.groups`</td>
-                <td>Группы пользователей.</td>
-            </tr>
-            <tr>
-                <td>`secoes.roles`</td>
-                <td>Роли пользователей (права доступа).</td>
-            </tr>
-            <tr>
-                <td>`secoes.users`</td>
-                <td>Информация о пользователях.</td>
-            </tr>
-            <tr>
-                <td>`secoes.user_group_memberships`</td>
-                <td>Связь между пользователями и группами.</td>
-            </tr>
-            <tr>
-                <td>(Добавьте другие таблицы вашей базы данных сюда)</td>
-                <td>(Добавьте их описание)</td>
-            </tr>
-        </tbody>
+    <tr>
+        <th>ID Группы</th>
+        <th>Название Группы</th>
+    </tr>
+    {% for group in groups %}
+        <tr>
+        <td>{{ group.group_id }}</td>
+        <td>{{ group.group_name }}</td>
+        </tr>
+    {% endfor %}
     </table>
-
-    <h2>Технологический стек:</h2>
-    <p> (Укажите используемые технологии, например, Django, PostgreSQL, Python и т.д.)</p>
-
-
-    <h2>Контакты:</h2>
-    <p>(Информация о контактах разработчиков или владельцев приложения)</p>
+    <script>
+  
+        const usersContent = document.getElementById('users-content');
+        const usersTab = document.getElementById('users-tab');
+      
+        if (userId === null || userId === undefined || userId === 0) { // Если пользователь не авторизован
+          usersTab.style.display = 'none';
+        } else {
+          usersTab.addEventListener('click', (event) => {
+            event.preventDefault();
+            usersContent.classList.remove('hidden');
+            // ... дополнительная логика для загрузки контента пользователей через AJAX
+          });
+        }
+      
+      
+        // Активная вкладка по умолчанию
+        const tabs = document.querySelectorAll('nav a');
+        const contents = document.querySelectorAll('section');
+      
+        tabs.forEach(tab => {
+          tab.addEventListener('click', (event) => {
+            event.preventDefault();
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            contents.forEach(content => content.classList.add('hidden'));
+            document.getElementById(tab.id.replace('-tab', '-content')).classList.remove('hidden');
+          });
+        });
+      
+      </script>
 
 </body>
 </html>
