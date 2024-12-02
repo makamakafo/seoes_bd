@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+</head>
+<body>
+    <h1>Вход в систему</h1>
+    <form method="POST">
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="user_id" name="user_id" required>
+        <button type="submit">Войти</button>
+    </form>
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault(); // предотвращаем стандартную отправку формы
+          const response = await fetch('http://127.0.0.1:5000/', {
+            method: form.method,
+            body: new FormData(form)
+          });
+          if (!response.redirected) {
+            const data = await response.json();
+            if (data.error) {
+              alert(data.error); //отображение alert
+            }
+          } else {
+            console.log(1)
+            window.location.href = '/homepage';
+          }
+        });
+      </script>
+</body>
+</html>
+

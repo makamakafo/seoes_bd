@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Бар - Конфиги</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+nav {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  display: inline;
+  margin-right: 20px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
+section {
+  padding: 20px;
+}
+.hidden {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+    {{ user_id }}
+    {{ role_id }}
+  
+    <nav>
+      <ul>
+        {% if role_id != 2 %}
+          <li><a href="/users" id="users-tab">Пользователи</a></li>
+        {% endif %}
+        <li><a href="/homepage" id="configs-tab" class="active">Конфиги</a></li>
+        <li><a href="/groups" id="groups-tab">Группы</a></li>
+      </ul>
+    </nav>
+  
+    <section id="users-content" class="hidden">
+      <h2>Пользователи</h2>
+      <!-- Здесь будет контент для пользователей -->
+      <p>Информация о пользователях будет загружена здесь после аутентификации.</p>
+    </section>
+  
+    <section id="configs-content">
+      <h2>Конфиги</h2>
+      <!-- Здесь будет контент для конфигов -->
+      <p>Настройки и конфигурации приложения.</p>
+    </section>
+  
+    <section id="groups-content" class="hidden">
+      <h2>Группы</h2>
+      <!-- Здесь будет контент для групп -->
+      <p>Информация о группах пользователей.</p>
+    </section>
+
+<script>
+
+  const usersContent = document.getElementById('users-content');
+  const usersTab = document.getElementById('users-tab');
+
+  if (userId === null || userId === undefined || userId === 0) { // Если пользователь не авторизован
+    usersTab.style.display = 'none';
+  } else {
+    usersTab.addEventListener('click', (event) => {
+      event.preventDefault();
+      usersContent.classList.remove('hidden');
+      // ... дополнительная логика для загрузки контента пользователей через AJAX
+    });
+  }
+
+
+  // Активная вкладка по умолчанию
+  const tabs = document.querySelectorAll('nav a');
+  const contents = document.querySelectorAll('section');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', (event) => {
+      event.preventDefault();
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      contents.forEach(content => content.classList.add('hidden'));
+      document.getElementById(tab.id.replace('-tab', '-content')).classList.remove('hidden');
+    });
+  });
+
+</script>
+
+</body>
+</html>
+
