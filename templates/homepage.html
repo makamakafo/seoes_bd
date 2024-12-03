@@ -27,8 +27,26 @@ nav a {
 section {
   padding: 20px;
 }
-.hidden {
-  display: none;
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}
+form {
+    margin-top: 20px;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
 </style>
 </head>
@@ -38,59 +56,164 @@ section {
       <ul>
         {% if role_id != 2 %}
           <li><a href="/users" id="users-tab">Пользователи</a></li>
+          <li><a href="/groups" id="groups-tab">Группы</a></li>
         {% endif %}
         <li><a href="/homepage" id="configs-tab" class="active">Конфиги</a></li>
-        <li><a href="/groups" id="groups-tab">Группы</a></li>
       </ul>
     </nav>
   
-    <section id="users-content" class="hidden">
-      <h2>Пользователи</h2>
-      <!-- Здесь будет контент для пользователей -->
-      <p>Информация о пользователях будет загружена здесь после аутентификации.</p>
-    </section>
-  
     <section id="configs-content">
-      <h2>Конфиги</h2>
-      <!-- Здесь будет контент для конфигов -->
-      <p>Настройки и конфигурации приложения.</p>
+      <h1>Конфиги</h1>
     </section>
-  
-    <section id="groups-content" class="hidden">
-      <h2>Группы</h2>
-      <!-- Здесь будет контент для групп -->
-      <p>Информация о группах пользователей.</p>
-    </section>
+    {% if role_id == 1 %}
+        <form id="add-config-form" action="{{url_for('home_page')}}" method="POST">
+            <input type="submit" value="Добавить конфиг"><br>
+            <label for="group_id">ID группы</label><br>
+            <input type="number" name="group_id" required><br>  
+            <label for="host_user_id">ID пользователя</label><br>
+            <input type="number" name="host_user_id" required><br> 
+            <label for="site_name">Имя сайта</label><br>
+            <input type="text" name="site_name" required><br> 
+            <label for="url">url</label><br>
+            <input type="text" name="url" required><br> 
+            <label for="access_token">токен доступа</label><br>
+            <input type="text" name="access_token" required><br> 
+        </form>
+        <form id="delete-config-form" action="{{url_for('home_page')}}" method="DELETE">
+            <input type="submit" value="Удалить конфиг"><br>
+            <label for="config_id">ID конфига</label><br>
+            <input type="number" name="config_id" required><br>  
+        </form>
+        <form id="update-config-form" action="{{url_for('home_page')}}" method="PUT">
+            <input type="submit" value="Изменить конфиг"><br>
+            <label for="config_id">ID конфига</label><br>
+            <input type="number" name="config_id" required><br>  
+            <label for="group_id">ID группы</label><br>
+            <input type="number" name="group_id" required><br>  
+            <label for="host_user_id">ID пользователя</label><br>
+            <input type="number" name="host_user_id" required><br> 
+            <label for="site_name">Имя сайта</label><br>
+            <input type="text" name="site_name" required><br> 
+            <label for="url">url</label><br>
+            <input type="text" name="url" required><br> 
+            <label for="access_token">токен доступа</label><br>
+            <input type="text" name="access_token" required><br> 
+        </form>
+    {% endif %}
+
+    <h2>Таблица Конфигов</h2>
+
+    <table>
+    {% if role_id == 1 %}
+        <tr>
+            <th>ID Конфига</th>
+            <th>ID Пользователя</th>
+            <th>сайт</th>
+            <th>url сайта</th>
+            <th>клиент</th>
+            <th>группа</th>
+            <th>Кол-во запросов по дням</th>
+            <th></th>
+        </tr>
+            {% for config in configs %}
+                <tr>
+                <td>{{ config[0] }}</td>
+                <td>{{ config[1] }}</td>
+                <td>{{ config[2] }}</td>
+                <td>{{ config[3] }}</td>
+                <td>{{ config[4]}}</td>
+                <td>{{ config[5] }}</td>
+                <td>{{ config[6] }}</td>
+                <td> <a href="/homepage/{{config[0]}}" id="config -tab">перейти</a> </td>
+                </tr>
+            {% endfor %}
+    {% endif %}
+    {% if role_id == 2 %}
+        <tr>
+            <th>ID Конфига</th>
+            <th>сайт</th>
+            <th>url сайта</th>
+            <th>клиент</th>
+            <th>группа</th>
+            <th>Кол-во запросов по дням</th>
+            <th></th>
+        </tr>
+            {% for config in configs %}
+                {% if config[1] == user_id %}
+                    <tr>
+                    <td>{{ config[0] }}</td>
+                    <td>{{ config[2] }}</td>
+                    <td>{{ config[3] }}</td>
+                    <td>{{ config[4] }}</td>
+                    <td>{{ config[5] }}</td>
+                    <td>{{ config[6] }}</td>
+                    <td> <a href="/homepage/{{config[0]}}" id="config -tab">перейти</a> </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+    </table>
 
 <script>
+// Активная вкладка по умолчанию
+  const addConfigForm = document.getElementById('add-config-form');
+  const deleteConfigForm = document.getElementById('delete-config-form');
+  const updateConfigForm = document.getElementById('update-config-form');
+  const apiUrl = 'http://192.168.56.1:5000/homepage'; // Define API URL once
 
-  const usersContent = document.getElementById('users-content');
-  const usersTab = document.getElementById('users-tab');
+  function handleSubmit(event, method) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
 
-  if (userId === null || userId === undefined || userId === 0) { // Если пользователь не авторизован
-    usersTab.style.display = 'none';
-  } else {
-    usersTab.addEventListener('click', (event) => {
-      event.preventDefault();
-      usersContent.classList.remove('hidden');
-      // ... дополнительная логика для загрузки контента пользователей через AJAX
+    for (let pair of formData.entries()) {
+    console.log(pair[0] + ', ' + pair[1]);
+    }
+
+    fetch(apiUrl, {
+      method: method,
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(data => {
+          throw new Error(data.error || 'Ошибка при обработке запроса.');
+        });
+      }
+      return response.json(); 
+    })
+    .then(data => {
+      console.log('Success:', data);
+      location.reload(); 
+    })
+    .catch(error => {
+      alert(error); 
     });
   }
 
-
+  addConfigForm.addEventListener('submit', (event) => handleSubmit(event, 'POST'));
+  deleteConfigForm.addEventListener('submit', (event) => handleSubmit(event, 'DELETE'));
+  updateConfigForm.addEventListener('submit', (event) => handleSubmit(event, 'PUT'));
   // Активная вкладка по умолчанию
   const tabs = document.querySelectorAll('nav a');
-  const contents = document.querySelectorAll('section');
+    const contents = document.querySelectorAll('section');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', (event) => {
-      event.preventDefault();
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      contents.forEach(content => content.classList.add('hidden'));
-      document.getElementById(tab.id.replace('-tab', '-content')).classList.remove('hidden');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (event) => {
+            // Удаляем активный класс со всех вкладок
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Если вкладка не активна (для конфигураций и групп), переходим по ссылке
+            if (!tab.classList.contains('active')) {
+                return; // переход по ссылке
+            }
+            // Если вкладка "Пользователи", показываем контент
+            contents.forEach(content => content.classList.add('hidden'));
+            document.getElementById(tab.id.replace('-tab', '-content')).classList.remove('hidden');
+            event.preventDefault(); // предотвратить стандартное поведение, если нужно
+        });
     });
-  });
 
 </script>
 

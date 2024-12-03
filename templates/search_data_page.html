@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Бар - Конфиги</title>
+<title>Конфиг</title>
 <style>
 body {
   font-family: sans-serif;
@@ -55,61 +55,74 @@ input[type="text"] {
     <nav>
       <ul>
         {% if role_id != 2 %}
-          <li><a href="/users" id="users-tab" class="active">Пользователи</a></li>
+          <li><a href="/users" id="users-tab">Пользователи</a></li>
           <li><a href="/groups" id="groups-tab">Группы</a></li>
         {% endif %}
         <li><a href="/homepage" id="configs-tab">Конфиги</a></li>
       </ul>
     </nav>
   
-    <section id="users-content">
-      <h1>Пользователи</h1>
+    <section id="config-content">
+      <h2>Конфиг {{config_id}}</h2>
+      <p>Информация с Search API.</p>
     </section>
-
-    <form id="add-user-form" action="{{url_for('users_page')}}" method="POST">
-      <input type="submit" value="Добавить пользователя"><br>
-      <label for="role_id">Роль: число 1 - админ, 2 - клиент</label><br>
-      <input type="number" name="role_id" min="1" max="2" required><br>  <!-- Changed to number input -->
-      <label for="user_full_name">Имя: Иван И.И.</label><br>
-      <input type="text" name="user_full_name" required><br> <!-- Corrected name -->
-      <label for="user_number">Номер: 8ХХХХХХХХХХ</label><br>
-      <input type="text" name="user_number" required><br> <!-- Corrected name -->
+    <form id="add-Search_data-form" action="{{url_for('search_data_page', config_id=config_id)}}" method="POST">
+        <input type="submit" value="Загрузить данные за сегодня"><br>
     </form>
-    
-    <form id="delete-user-form" action="{{url_for('users_page')}}" method="DELETE">
-      <input type="submit" value="Удалить пользователя"><br>
-      <label for="user_id">Id: число</label><br>
-      <input type="number" name="Id" required><br> <!-- Changed to number input -->
-    </form>
+    {% if role_id == 1 %}
+        <form id="delete-Search_data-form" action="{{url_for('search_data_page', config_id=config_id)}}" method="DELETE">
+            <input type="submit" value="Удалить данные"><br>
+            <label for="search_id">ID Search</label><br>
+            <input type="number" name="search_id" required><br>  
+        </form>
+    {% endif %}
 
-    <h2>Таблица Пользователей</h2>
 
     <table>
-      <tr>
-        <th>ID Пользователя</th>
-        <th>ID Роли</th>
-        <th>Полное Имя</th>
-        <th>Номер</th>
-      </tr>
-      {% for user in users %}
         <tr>
-          <td>{{ user['user_id'] }}</td>
-          <td>{{ user['role_id'] }}</td>
-          <td>{{ user['user_full_name'] }}</td>
-          <td>{{ user['user_number'] }}</td>
+            <th>ID Search</th>
+            <th>сайт</th>
+            <th>url сайта</th>
+            <th>клиент</th>
+            <th>группа</th>
+            <th>дата выгрузки</th>
+            <th>Средняя позиция</th>
+            <th>кол-во кликов</th>
+            <th>кол-во показов</th>
+            <th>кликов/показам</th>
         </tr>
-      {% endfor %}
-    </table>
+        {% for data in search_data %}
+          <tr>
+                <td>{{ data[0] }}</td>
+                <td>{{ data[2] }}</td>
+                <td>{{ data[3] }}</td>
+                <td>{{ data[4]}}</td>
+                <td>{{ data[5] }}</td>
+                <td>{{ data[6] }}</td>
+                <td>{{ data[7] }}</td>
+                <td>{{ data[8]}}</td>
+                <td>{{ data[9] }}</td>
+                <td>{{ data[10]|round(2) }} % </td>
+          </tr>
+        {% endfor %}
+      </table>
 
 <script>
-  const addUserForm = document.getElementById('add-user-form');
-  const deleteUserForm = document.getElementById('delete-user-form');
-  const apiUrl = 'http://192.168.56.1:5000/users'; // Define API URL once
+
+  const addSearch_dataForm = document.getElementById('add-Search_data-form');
+  const deleteSearch_dataForm = document.getElementById('delete-Search_data-form');
+  const apiUrl = 'http://192.168.56.1:5000/homepage/{{config_id}}'; // Define API URL once
 
   function handleSubmit(event, method) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+
+    for (let pair of formData.entries()) {
+    console.log(pair[0] + ', ' + pair[1]);
+    }
+
+
     fetch(apiUrl, {
       method: method,
       body: formData
@@ -120,19 +133,19 @@ input[type="text"] {
           throw new Error(data.error || 'Ошибка при обработке запроса.');
         });
       }
-      return response.json(); // Or just response.text() if you don't need JSON
+      return response.json(); 
     })
     .then(data => {
-      // Handle successful response (optional)  e.g., refresh the table
       console.log('Success:', data);
-      location.reload(); // Refresh page to show changes
+      location.reload(); 
     })
     .catch(error => {
-      alert(error); // Display error message
+      alert(error); 
     });
   }
-  addUserForm.addEventListener('submit', (event) => handleSubmit(event, 'POST'));
-  deleteUserForm.addEventListener('submit', (event) => handleSubmit(event, 'DELETE'));
+
+  addSearch_dataForm.addEventListener('submit', (event) => handleSubmit(event, 'POST'));
+  deleteSearch_dataForm.addEventListener('submit', (event) => handleSubmit(event, 'DELETE'));
   // Активная вкладка по умолчанию
   const tabs = document.querySelectorAll('nav a');
     const contents = document.querySelectorAll('section');
@@ -153,7 +166,9 @@ input[type="text"] {
             event.preventDefault(); // предотвратить стандартное поведение, если нужно
         });
     });
+
 </script>
+
 </body>
 </html>
 
